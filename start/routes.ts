@@ -8,9 +8,6 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import HandleMessagesController from '#controllers/handle_messages_controller'
 
-router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
-})
+router.post('/api/v1/chat', [HandleMessagesController, 'chat'])
