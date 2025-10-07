@@ -1,11 +1,13 @@
+// validators/message.ts
 import vine from '@vinejs/vine'
 
 export const MessageValidation = vine.compile(
   vine.object({
-    contents: vine.array(
+    input: vine.array(
       vine.object({
-        role: vine.string().in(['tool', 'user', 'model']).trim(),
-        parts: vine.array(vine.object({ text: vine.string().trim().minLength(2) })),
+        content: vine.string().minLength(1),
+        role: vine.enum(['user', 'assistant', 'system', 'developer']),
+        type: vine.literal('message').optional(),
       })
     ),
   })
