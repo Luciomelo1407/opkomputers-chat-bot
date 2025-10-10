@@ -10,5 +10,7 @@
 import router from '@adonisjs/core/services/router'
 import HandleMessagesController from '#controllers/handle_messages_controller'
 import { middleware } from './kernel.js'
+import CaptchasController from '#controllers/captchas_controller'
 
 router.post('/api/v1/chat', [HandleMessagesController, 'chat']).use([middleware.apiKey()])
+router.post('/api/v1/captcha', [CaptchasController, 'handleCaptcha']).use(middleware.apiKey())
