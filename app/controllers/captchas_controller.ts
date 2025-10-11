@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { TurnstileResponse } from '../types/TruenstileResponse.js'
 
 export default class CaptchasController {
   async handleCaptcha({ request, response }: HttpContext) {
@@ -13,22 +14,27 @@ export default class CaptchasController {
       formData.append('secret', process.env.SECRET_CAPTCHA_KEY)
       formData.append('response', token.token)
       formData.append('remoteip', request.ip())
-      console.log(formData, '\n\n\n')
 
-      try {
-        const ress = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      const responseApiCaptcha = await fetch(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        {
           method: 'POST',
           body: formData,
-        })
+        }
+      )
+      const result = (await responseApiCaptcha.json()) as TurnstileResponse
 
-        const result = await ress.json()
-        return response.ok({ result })
-      } catch (error) {
-        console.error('Turnstile validation error:', error)
-        return response.internalServerError({ 'success': false, 'error-codes': ['internal-error'] })
+      if (result.success) {
+        return response.ok({
+          message: 'The CAPTCHA has been completed successfully.',
+          status: result.success,
+        })
       }
 
-      return response.ok({})
+      return response.internalServerError({
+        message: result['error-codes'],
+        status: result.success,
+      })
     } catch (error) {
       throw error
     }
